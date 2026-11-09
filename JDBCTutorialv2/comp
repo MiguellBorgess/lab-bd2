@@ -1,0 +1,31 @@
+#!/bin/bash
+set -e
+derby=/usr/share/java/derby.jar
+mypath=/home/miguel/Projects/university/lab-bd2/JDBCTutorialv2
+mypackage=com/oracle/tutorial/jdbc
+
+if [ -r "$mypath/src/$mypackage/$1.java" -a -r "$mypath/$2" ]; then
+
+	javac -cp "$derby:$mypath/classes:$mypath/lib/JDBCTutorial.jar" "$mypath/src/$mypackage/$1.java"
+	javac_result=$?
+	if [ $javac_result -ne 0 ]; then
+		echo "Erro ao compilar $1.java. Código de saída: $javac_result"
+		exit 1
+	fi
+
+	if [ -r "$mypath/src/$mypackage/$1.class" ]; then
+		mv "$mypath/src/$mypackage/$1.class" "$mypath/classes/$mypackage/"
+
+		java -cp "$derby:$mypath/classes" "$mypackage/$1" "$mypath/$2"
+		java_result=$?
+		if [ $java_result -ne 0 ]; then
+			echo "Erro ao executar $1. Código de saída: $java_result"
+			exit 1
+		fi
+	fi
+else
+	echo "Missing file, check:"
+	ls "$mypath/src/$mypackage/$1.java"
+	ls "$mypath/$2"
+	exit 1
+fi
