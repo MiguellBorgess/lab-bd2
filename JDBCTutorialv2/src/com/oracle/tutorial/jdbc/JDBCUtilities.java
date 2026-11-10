@@ -140,7 +140,14 @@ public class JDBCUtilities {
     if ("mysql".equals(this.dbms) || "postgresql".equals(this.dbms)) {
         conn.setCatalog(this.dbName);
     }
-    
+   
+    else if (this.dbms.equals("postgresql")) {
+	String currentUrlString = "jdbc:" + this.dbms + "://" + this.serverName + ":" + this.portNumber + "/" + this.dbName;
+	conn = DriverManager.getConnection(currentUrlString, connectionProps);
+	this.urlString = currentUrlString + this.dbName;
+	conn.setCatalog(this.dbName);
+	}
+
     System.out.println("Connected to database");
     return conn;
   }
