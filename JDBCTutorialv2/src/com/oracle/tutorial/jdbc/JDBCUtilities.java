@@ -148,6 +148,13 @@ public class JDBCUtilities {
 	conn.setCatalog(this.dbName);
 	}
 
+   else if (this.dbms.equals("sqlite")) {
+	String currentUrlString = "jdbc:" + this.dbms + ":" + this.dbName;
+	conn = DriverManager.getConnection(currentUrlString, connectionProps);
+	this.urlString = currentUrlString + this.dbName;
+	conn.setCatalog(this.dbName);
+	}
+
     System.out.println("Connected to database");
     return conn;
   }
