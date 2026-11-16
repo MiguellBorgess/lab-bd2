@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 derby=/usr/share/java/derby.jar
-mypath=/home/filipe/Documents/BD2/lab-bd2/JDBCTutorialv2
+postgres=/home/miguel/Projects/university/lab-bd2/JDBCTutorialv2/postgresql-42.2.4.jar
+sqlite=/home/miguel/Projects/university/lab-bd2/JDBCTutorialv2/sqlite-jdbc-3.54.1.0.jar
+mypath=/home/miguel/Projects/university/lab-bd2/JDBCTutorialv2
 mypackage=com/oracle/tutorial/jdbc
-postgres=/home/filipe/Documents/BD2/lab-bd2/JDBCTutorialv2/postgresql-42.2.4.jar
-sqlite=/home/filipe/Documents/BD2/lab-bd2/JDBCTutorialv2/sqlite-jdbc-3.36.0.3.jar
 
 if [ -r "$mypath/src/$mypackage/$1.java" -a -r "$mypath/$2" ]; then
 
-	javac -cp "$sqlite:$mypath/classes:$mypath/lib/JDBCTutorial.jar" "$mypath/src/$mypackage/$1.java"
+	javac -cp "$derby:$mypath/classes:$mypath/lib/JDBCTutorial.jar:$postgres:$sqlite" "$mypath/src/$mypackage/$1.java"
 	javac_result=$?
 	if [ $javac_result -ne 0 ]; then
 		echo "Erro ao compilar $1.java. Código de saída: $javac_result"
@@ -18,7 +18,7 @@ if [ -r "$mypath/src/$mypackage/$1.java" -a -r "$mypath/$2" ]; then
 	if [ -r "$mypath/src/$mypackage/$1.class" ]; then
 		mv "$mypath/src/$mypackage/$1.class" "$mypath/classes/$mypackage/"
 
-		java -cp "$sqlite:$mypath/classes" "$mypackage/$1" "$mypath/$2"
+		java -cp "$derby:$mypath/classes:$postgres:$sqlite" "$mypackage/$1" "$mypath/$2"
 		java_result=$?
 		if [ $java_result -ne 0 ]; then
 			echo "Erro ao executar $1. Código de saída: $java_result"

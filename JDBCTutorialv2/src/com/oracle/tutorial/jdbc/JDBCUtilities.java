@@ -127,34 +127,50 @@ public class JDBCUtilities {
     connectionProps.put("user", this.userName);
     connectionProps.put("password", this.password);
 
-    this.urlString = switch (this.dbms) {
-        case "mysql" -> "jdbc:" + this.dbms + "://" + this.serverName + ":" + this.portNumber + "/" + this.dbName;
-        case "postgresql" -> "jdbc:" + this.dbms + "://" + this.serverName + ":" + this.portNumber + "/" + this.dbName;
-        case "derby" -> "jdbc:" + this.dbms + ":" + this.dbName + ";create=true";
-        case "sqlite" -> "jdbc:sqlite:" + this.dbName;
-        default -> throw new SQLException("Database management system not supported: " + this.dbms);
-    };
+    /* Versão fornecida, com switch (mantida como referência).
+     * Substituída pela estrutura if/else if pedida na questão 5.
+     *
+     *     this.urlString = switch (this.dbms) {
+     *         case "mysql" -> "jdbc:" + this.dbms + "://" + this.serverName + ":" + this.portNumber + "/" + this.dbName;
+     *         case "postgresql" -> "jdbc:" + this.dbms + "://" + this.serverName + ":" + this.portNumber + "/" + this.dbName;
+     *         case "derby" -> "jdbc:" + this.dbms + ":" + this.dbName + ";create=true";
+     *         case "sqlite" -> "jdbc:sqlite:" + this.dbName;
+     *         default -> throw new SQLException("Database management system not supported: " + this.dbms);
+     *     };
+     *
+     *     Connection conn = DriverManager.getConnection(this.urlString, connectionProps);
+     *
+     *     if ("mysql".equals(this.dbms) || "postgresql".equals(this.dbms)) {
+     *         conn.setCatalog(this.dbName);
+     *     }
+     */
 
-    Connection conn = DriverManager.getConnection(this.urlString, connectionProps);
-
-    if ("mysql".equals(this.dbms) || "postgresql".equals(this.dbms)) {
-        conn.setCatalog(this.dbName);
+    // Alterando do switch para if/else como requisitado na questão 5
+    Connection conn = null;
+    if (this.dbms.equals("mysql")) {
+      String currentUrlString = "jdbc:" + this.dbms + "://" + this.serverName + ":" +
+          this.portNumber + "/" + this.dbName;
+      conn = DriverManager.getConnection(currentUrlString, connectionProps);
+      this.urlString = currentUrlString;
+      conn.setCatalog(this.dbName);
+    } else if (this.dbms.equals("derby")) {
+      String currentUrlString = "jdbc:" + this.dbms + ":" + this.dbName + ";create=true";
+      conn = DriverManager.getConnection(currentUrlString, connectionProps);
+      this.urlString = currentUrlString;
+    } else if (this.dbms.equals("postgresql")) {
+      String currentUrlString = "jdbc:" + this.dbms + "://" + this.serverName + ":" +
+          this.portNumber + "/" + this.dbName;
+      conn = DriverManager.getConnection(currentUrlString, connectionProps);
+      this.urlString = currentUrlString + this.dbName;
+      conn.setCatalog(this.dbName);
+    } else if (this.dbms.equals("sqlite")) {
+      String currentUrlString = "jdbc:" + this.dbms + ":" + this.dbName;
+      conn = DriverManager.getConnection(currentUrlString, connectionProps);
+      this.urlString = currentUrlString;
+    } else {
+      throw new SQLException("Database management system not supported: " + this.dbms);
     }
-   
-    else if (this.dbms.equals("postgresql")) {
-	String currentUrlString = "jdbc:" + this.dbms + "://" + this.serverName + ":" + this.portNumber + "/" + this.dbName;
-	conn = DriverManager.getConnection(currentUrlString, connectionProps);
-	this.urlString = currentUrlString + this.dbName;
-	conn.setCatalog(this.dbName);
-	}
-
-   else if (this.dbms.equals("sqlite")) {
-	String currentUrlString = "jdbc:" + this.dbms + ":" + this.dbName;
-	conn = DriverManager.getConnection(currentUrlString, connectionProps);
-	this.urlString = currentUrlString + this.dbName;
-	conn.setCatalog(this.dbName);
-	}
-
+    
     System.out.println("Connected to database");
     return conn;
   }

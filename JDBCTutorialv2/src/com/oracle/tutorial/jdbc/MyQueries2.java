@@ -18,13 +18,13 @@ public class MyQueries2 {
 
   public static void getMyData(Connection con) throws SQLException {
     String query = 
-      "SELECT cl.nome_cliente " +
-      "FROM cliente cl " +
-      "EXCEPT " +
-      "SELECT cl.nome_cliente " +
-      "FROM cliente cl " +
-      "JOIN emprestimo e ON e.nome_cliente = cl.nome_cliente " +
-      "JOIN deposito d ON d.nome_cliente = cl.nome_cliente";
+      "select nome_cliente from cliente c " +
+      "where nome_cliente not in (select nome_cliente " +
+                    "from emprestimo " +
+                    "union " +
+                    "select nome_cliente " +
+                    "from deposito ) " + 
+      "order by nome_cliente";
 
 
     try (PreparedStatement pstmt = con.prepareStatement(query)) {
@@ -33,11 +33,11 @@ public class MyQueries2 {
         boolean found = false;
         while (rs.next()) {
           found = true;
-          String nomeCliente = rs.getString("nome_cliente");
-          System.out.println("Cliente: " + nomeCliente);
+          String nome_cliente = rs.getString("nome_cliente");
+          System.out.println( "Nome Cliente: " + nome_cliente);
         }
         if (!found) {
-          System.out.println("     No coffees found for this supplier.");
+          System.out.println("     Nenhum cliente encontrado");
         }
       }
     } catch (SQLException e) {

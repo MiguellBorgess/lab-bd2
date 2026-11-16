@@ -18,10 +18,12 @@ public class MyQueries3 {
 
   public static void getMyData(Connection con) throws SQLException {
     String query = 
-	"SELECT a.nome_agencia, COUNT(d.numero_deposito) AS quantidade, SUM(d.saldo_deposito) AS montante " +
-	"FROM agencia a " +
-	"JOIN deposito d ON a.nome_agencia = d.nome_agencia " +
-	"GROUP BY a.nome_agencia";
+      "select nome_agencia, count(saldo_deposito) as quantidade_deposito, sum(saldo_deposito) as soma_deposito " +
+      "from deposito " +
+      "group by nome_agencia " +
+      "order by nome_agencia ";
+
+
 
     try (PreparedStatement pstmt = con.prepareStatement(query)) {
             
@@ -29,13 +31,13 @@ public class MyQueries3 {
         boolean found = false;
         while (rs.next()) {
           found = true;
-          String nomeAgencia = rs.getString("nome_agencia");
-          int quantidade = rs.getInt("quantidade");
-          double montante = rs.getDouble("montante");
-          System.out.println("Agência: " + nomeAgencia + " | Quantidade: " + quantidade + " | Montante: " + montante);
+          String nome_agencia = rs.getString("nome_agencia");
+          long count_deposito = rs.getLong("quantidade_deposito");
+          double sum_deposito = rs.getDouble("soma_deposito");
+          System.out.println("Agencia: " + nome_agencia + " | Quantidade Depositos: " + count_deposito + " | Soma Depositos: " + String.format("%.2f", sum_deposito));
         }
         if (!found) {
-          System.out.println("     No coffees found for this supplier.");
+          System.out.println("    Nenhuma agencia encontrada");
         }
       }
     } catch (SQLException e) {
